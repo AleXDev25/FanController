@@ -30,6 +30,8 @@ uint8_t sp = 2;
 
 unsigned long SENS_prevMillis = 0; 
 const long SENS_interval = 1000;
+unsigned long CHANGE_prevMillis = 0; 
+const long CHANGE_interval = 250;
 
 float GetTemp(byte *sensor){
   byte data[12];
@@ -116,7 +118,7 @@ void saveParam(){
   oled.println("SAVE PARAM?");
   oled.setTextSize(3);
   oled.setTextColor(WHITE);
-  oled.print("Y-U N-D");
+  oled.print("YES-UP");
   oled.display();
   //delay(2000);
   oled.clearDisplay();
@@ -183,7 +185,7 @@ void loop() {
   keyOK.update();
 
   if (currentMillis - SENS_prevMillis >= SENS_interval){
-    SENS_prevMillis = currentMillis;
+    SENS_prevMillis = currentMillis;    
     current_water_temp=GetTemp(water_sens);
     delay(10);
     engine_temp=GetTemp(engine_sens);    
@@ -197,12 +199,24 @@ void loop() {
     if(keyDN.fell()) disp_mode=0;
   }
   if(mode==1){
-    if(keyUP.read() == 0) fan_on_temp+=0.5;
-    if(keyDN.read() == 0) fan_on_temp-=0.5;
+    if(keyUP.read() == 0 && currentMillis - CHANGE_prevMillis >= CHANGE_interval) {
+      CHANGE_prevMillis = currentMillis;
+      fan_on_temp+=0.5;
+    }
+    if(keyDN.read() == 0 && currentMillis - CHANGE_prevMillis >= CHANGE_interval) {
+      CHANGE_prevMillis = currentMillis;
+      fan_on_temp-=0.5;
+    }
   }
   if(mode==2){
-    if(keyUP.read() == 0) fan_off_temp+=0.5;
-    if(keyDN.read() == 0) fan_off_temp-=0.5;
+    if(keyUP.read() == 0 && currentMillis - CHANGE_prevMillis >= CHANGE_interval) {
+      CHANGE_prevMillis = currentMillis;
+      fan_off_temp+=0.5;
+    }
+    if(keyDN.read() == 0 && currentMillis - CHANGE_prevMillis >= CHANGE_interval) {
+      CHANGE_prevMillis = currentMillis;
+      fan_off_temp-=0.5;
+    }
   }
   if(mode==3){
     if(keyUP.fell()) sp=1;
