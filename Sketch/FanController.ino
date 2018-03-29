@@ -25,13 +25,14 @@ float fan_off_temp = 83.0;
 float current_water_temp = 0;
 float engine_temp = 0;
 boolean disp_mode = 0;
+boolean relay_mode = 0;
 uint8_t mode = 0;
 uint8_t sp = 2;
 
 unsigned long SENS_prevMillis = 0; 
 const long SENS_interval = 1000;
 unsigned long CHANGE_prevMillis = 0; 
-const long CHANGE_interval = 250;
+const long CHANGE_interval = 500;
 
 float GetTemp(byte *sensor){
   byte data[12];
@@ -167,12 +168,16 @@ void setup(){
   digitalWrite(R1_PIN, HIGH);
   pinMode(KEY_UP, INPUT_PULLUP);
   pinMode(KEY_DN, INPUT_PULLUP);
-  pinMode(KEY_OK, INPUT_PULLUP);  
+  pinMode(KEY_OK, INPUT_PULLUP); 
+  pinMode(12, INPUT); 
 
   delay(5);
   EEPROM_read_mem(8, &fan_on_temp, sizeof(fan_on_temp));
   delay(5);
   EEPROM_read_mem(16, &fan_off_temp, sizeof(fan_off_temp));
+
+  if(digitalRead(12) == 0) relay_mode = 0;
+  else relay_mode = 1;
   
 }
 
@@ -226,8 +231,15 @@ void loop() {
 
   show();
 
-  if(current_water_temp >= fan_on_temp) digitalWrite(R1_PIN, LOW);
-  if(current_water_temp <= fan_off_temp) digitalWrite(R1_PIN, HIGH);
+  if(relay_mode){
+    if(current_water_temp >= fan_on_temp) digitalWrite(R1_PIN, LOW);
+    if(current_water_temp <= fan_off_temp) digitalWrite(R1_PIN, HIGH);
+  }
+
+  if(!relay_mode){
+    if(current_water_temp >= fan_on_temp) digitalWrite(R1_PIN, HIGH);
+    if(current_water_temp <= fan_off_temp) digitalWrite(R1_PIN, LOW);
+  }
 
   //delay(50);
 }
