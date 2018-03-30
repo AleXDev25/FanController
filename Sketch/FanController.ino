@@ -5,11 +5,11 @@
 #include <OneWire.h>
 #include <EEPROM2.h>
 
-#define KEY_UP 4
-#define KEY_DN 5
-#define KEY_OK 3
-#define DS_PIN 2
-#define R1_PIN 13
+#define KEY_UP 9
+#define KEY_DN 8
+#define KEY_OK 10
+#define DS_PIN 5
+#define R1_PIN 6
 
 Adafruit_SSD1306 oled;
 OneWire ds(DS_PIN);
